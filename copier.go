@@ -3,7 +3,11 @@ package copier
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"reflect"
+	"time"
+
+	"github.com/globalsign/mgo/bson"
 )
 
 // Copy copy things
@@ -168,7 +172,17 @@ func set(to, from reflect.Value) bool {
 			to = to.Elem()
 		}
 
-		if from.Type().ConvertibleTo(to.Type()) {
+		fromTypeName := from.Type().Name()
+		toTypeName := to.Type().Name()
+		if fromTypeName == "ObjectId" && toTypeName == "string" {
+			fmt.Println(from.Interface().(bson.ObjectId).Hex())
+			to.SetString(from.Interface().(bson.ObjectId).Hex())
+		} else if fromTypeName == "int64" && toTypeName == "Time" {
+			t := time.Unix(from.Int(), 0)
+			to.Set(reflect.ValueOf(t))
+		} else if fromTypeName == "Time" && toTypeName == "int64" {
+			to.SetInt(from.Interface().(time.Time).Unix())
+		} else if from.Type().ConvertibleTo(to.Type()) {
 			to.Set(from.Convert(to.Type()))
 		} else if scanner, ok := to.Addr().Interface().(sql.Scanner); ok {
 			err := scanner.Scan(from.Interface())

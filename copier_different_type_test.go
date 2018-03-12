@@ -2,19 +2,24 @@ package copier_test
 
 import (
 	"testing"
+	"time"
 
-	"github.com/jinzhu/copier"
+	"github.com/globalsign/mgo/bson"
+	"github.com/yeeuu/copier"
 )
 
 type TypeStruct1 struct {
-	Field1 string
-	Field2 string
-	Field3 TypeStruct2
-	Field4 *TypeStruct2
-	Field5 []*TypeStruct2
-	Field6 []TypeStruct2
-	Field7 []*TypeStruct2
-	Field8 []TypeStruct2
+	Field1  string
+	Field2  string
+	Field3  TypeStruct2
+	Field4  *TypeStruct2
+	Field5  []*TypeStruct2
+	Field6  []TypeStruct2
+	Field7  []*TypeStruct2
+	Field8  []TypeStruct2
+	Field9  bson.ObjectId
+	Field10 time.Time
+	Field11 int64
 }
 
 type TypeStruct2 struct {
@@ -34,8 +39,11 @@ type TypeStruct3 struct {
 }
 
 type TypeStruct4 struct {
-	field1 int
-	Field2 string
+	field1  int
+	Field2  string
+	Field9  string
+	Field10 int64
+	Field11 time.Time
 }
 
 func (t *TypeStruct4) Field1(i int) {
@@ -58,8 +66,11 @@ func TestCopyDifferentFieldType(t *testing.T) {
 
 func TestCopyDifferentTypeMethod(t *testing.T) {
 	ts := &TypeStruct1{
-		Field1: "str1",
-		Field2: "str2",
+		Field1:  "str1",
+		Field2:  "str2",
+		Field9:  bson.NewObjectId(),
+		Field10: time.Now(),
+		Field11: time.Now().Unix(),
 	}
 	ts4 := &TypeStruct4{}
 
@@ -67,6 +78,12 @@ func TestCopyDifferentTypeMethod(t *testing.T) {
 
 	if ts4.Field2 != ts.Field2 || ts4.field1 != 0 {
 		t.Errorf("Should be able to copy from ts to ts4")
+	}
+	if ts.Field10.Unix() != ts4.Field10 || ts.Field11 != ts4.Field11.Unix() {
+		t.Errorf("Should be able to copy time from ts to ts4")
+	}
+	if ts.Field9.Hex() != ts4.Field9 {
+		t.Errorf("Should be able to copy bson from ts to ts4")
 	}
 }
 
