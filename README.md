@@ -1,4 +1,5 @@
 # Copier
+[![Build Status](https://travis-ci.org/yeeuu/copier.svg?branch=master)](https://travis-ci.org/yeeuu/copier)[![codecov](https://codecov.io/gh/yeeuu/copier/branch/master/graph/badge.svg)](https://codecov.io/gh/yeeuu/copier)
 
   I am a copier, I copy everything from one to another
 
